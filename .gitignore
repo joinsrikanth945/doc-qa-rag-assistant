@@ -10,3 +10,5 @@ wheels/
 .venv
 /uploads
 .env
+qdrant_local_db/
+qdrant_storage/

@@ -40,7 +40,7 @@ async def send_rag_ingest_event(pdf_path: Path) -> None:
     )
 
 
-st.title("Temenos Wealth Banking Reference")
+st.title("Upload a PDF")
 uploaded = st.file_uploader("Choose a PDF", type=["pdf"], accept_multiple_files=False)
 
 if uploaded is not None:
@@ -54,7 +54,7 @@ if uploaded is not None:
     st.caption("You can upload another PDF if you like.")
 
 st.divider()
-st.title("WealthSuite Knowledge Assistant for Consultants and Clients")
+st.title("Ask Questions About Your Documents")
 
 
 async def send_rag_query_event(question: str, top_k: int) -> None:

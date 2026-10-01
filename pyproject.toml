@@ -1,7 +1,7 @@
 [project]
-name = "ragproductionapp"
+name = "doc-qa-rag-assistant"
 version = "0.1.0"
-description = "Add your description here"
+description = "A RAG app that ingests PDFs and answers questions with sources, built with FastAPI, Inngest, Qdrant and Streamlit"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
