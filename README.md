@@ -1,4 +1,4 @@
-# ProductionGradeRAGPythonApp
+# RAG Agent
 
 A production-leaning Retrieval-Augmented Generation (RAG) application in Python: ingest PDF documents, ask questions about them in natural language, and get grounded answers with source citations.
 
