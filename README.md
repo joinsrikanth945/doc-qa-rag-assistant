@@ -83,3 +83,11 @@ uv run streamlit run streamlit_app.py
 ## License
 
 Add a license (e.g. MIT) here if you intend to keep this public.﻿# ProductionGradeRAGPythonApp
+
+Results obtained 
+
+<img width="1379" height="916" alt="image" src="https://github.com/user-attachments/assets/afe62d13-a460-4f89-bb58-a6aabb49be81" />
+
+
+
+
