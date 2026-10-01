@@ -84,9 +84,7 @@ Then open http://localhost:8501 for the app and http://localhost:8288 for the In
 
 ## Results
 
-<img width="1379" height="916" alt="image" src="https://github.com/user-attachments/assets/afe62d13-a460-4f89-bb58-a6aabb49be81" />
-
-<img width="1330" height="1027" alt="image" src="https://github.com/user-attachments/assets/e9c06b52-c321-43e0-a4cd-278af1cbe922" />
+![Answer with sources in the Streamlit app](docs/images/answer.png)
 
 <img width="1831" height="873" alt="image" src="https://github.com/user-attachments/assets/f2cf3d1c-23c5-4403-aff8-2a82c9fecc4b" />
 
