@@ -1,7 +1,7 @@
 [project]
 name = "doc-qa-rag-assistant"
 version = "0.1.0"
-description = "A RAG app that ingests PDFs and answers questions with sources, built with FastAPI, Inngest, Qdrant and Streamlit"
+description = "Conversational Q&A over PDF, Word and text documents with hybrid retrieval and page-level citations"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
@@ -9,9 +9,21 @@ dependencies = [
     "inngest>=0.5.6",
     "llama-index-core>=0.14.0",
     "llama-index-readers-file>=0.5.4",
+    "docx2txt>=0.9",
     "openai>=1.107.0",
     "python-dotenv>=1.1.1",
     "qdrant-client>=1.15.1",
+    "rank-bm25>=0.2.2",
+    "requests>=2.32",
     "streamlit>=1.49.1",
     "uvicorn>=0.35.0",
 ]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "python-docx>=1.1",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

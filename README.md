@@ -1,89 +1,39 @@
 # doc-qa-rag-assistant
 
-A production-leaning Retrieval-Augmented Generation (RAG) application in Python: ingest PDF documents, ask questions about them in natural language, and get grounded answers with source citations.
+Conversational question answering over your own documents (PDF, Word, Markdown, text). Answers are grounded in the documents and cite the exact passage and page they came from.
 
-I adapted this pattern to make long technical product documentation searchable in natural language, cutting down time spent digging through manuals and internal wikis.
+I built this to make long technical product documentation searchable in natural language, cutting down time spent digging through manuals and internal wikis.
 
+## Origin and credit
 
-## Features
+The project started from a public tutorial on building a production-style RAG app with FastAPI, Inngest, Qdrant and Streamlit: [TUTORIAL NAME](TUTORIAL-LINK). The tutorial supplied the basic ingest → embed → search → answer pipeline and the Inngest/Streamlit wiring. Everything listed under **What I added** below is my own work on top of it.
 
-- PDF ingestion and chunking pipeline (LlamaIndex)
-- Vector storage and semantic search via Qdrant (local instance, cosine similarity)
-- Event-driven, durable workflows via Inngest — ingestion and querying are modeled as Inngest functions with automatic retries
-- Built-in throttling and per-source rate limiting on ingestion, so repeated or bulk uploads don't overwhelm the pipeline
-- OpenAI LLM for grounded answer generation, with responses returned alongside the source documents they were drawn from
-- FastAPI backend exposing ingestion and query as HTTP endpoints
-- Streamlit front-end for interactive querying
+## What I added
 
-## Tech stack
-
-- Python 3.13
-- FastAPI + Uvicorn
-- Inngest for event-driven workflow orchestration
-- LlamaIndex (`llama-index-core`, `llama-index-readers-file`) for document loading and chunking
-- Qdrant (`qdrant-client`) as the vector database
-- OpenAI API for embeddings and answer generation
-- Streamlit for the UI
-- `uv` for dependency management
-
-## How it works
-
-1. **Ingest** — a PDF is loaded and split into chunks, each chunk is embedded and upserted into Qdrant with an ID derived from the source document and chunk index.
-2. **Query** — a user's question is embedded and used to search Qdrant for the most relevant chunks; those chunks are passed as context to an OpenAI model, which generates an answer along with the source documents it drew from.
-3. Both steps run as Inngest functions, which gives them retries, throttling and rate limiting out of the box, and are exposed over HTTP via FastAPI.
-
-## Project structure
-
-| File | Purpose |
-|---|---|
-| `main.py` | FastAPI app and Inngest functions (`rag_ingest_pdf`, `rag_query_pdf_ai`) |
-| `vector_db.py` | `QdrantStorage` class — upsert and similarity search against Qdrant |
-| `data_loader.py` | PDF loading and chunking logic |
-| `ingest_all.py` | Batch ingestion entry point |
-| `custom_types.py` | Shared type/schema definitions |
-| `streamlit_app.py` | Streamlit UI for querying |
-
-## Getting started
-
-### Prerequisites
-
-- Python 3.13+
-- [`uv`](https://docs.astral.sh/uv/) package manager
-- An OpenAI API key
-- A running Inngest dev server for local event handling
-
-### Installation
-
-```bash
-git clone https://github.com/joinsrikanth945/doc-qa-rag-assistant.git
-cd doc-qa-rag-assistant
-uv sync
-```
-
-### Configuration
-
-Create a `.env` file in the project root:
-
-```
-OPENAI_API_KEY=your-key-here
-```
-
-### Run
-
-```bash
-# terminal 1: start the FastAPI / Inngest backend
-uv run uvicorn main:app --reload --port 8000
-
-# terminal 2: start the Inngest dev server
-npx inngest-cli@latest dev -u http://127.0.0.1:8000/api/inngest
-
-# terminal 3: start the Streamlit UI
-uv run streamlit run streamlit_app.py
-```
-
-Then open http://localhost:8501 for the app and http://localhost:8288 for the Inngest dashboard.
+| Area | Change | Why |
+|---|---|---|
+| Retrieval | **Hybrid search**: dense vectors + BM25 keyword search, merged with Reciprocal Rank Fusion (`retrieval.py`) | Embeddings blur exact terms like error codes and model numbers; keyword search catches them |
+| Retrieval | Optional **LLM re-ranking** of a larger candidate pool | Puts the most useful passages first when the top hits are close |
+| Answers | **Numbered citations with page numbers**; the UI shows which passages were cited | Users can verify every claim against the source |
+| Answers | Stricter grounding prompt: says when the answer is not in the documents | Fewer made-up answers |
+| Chat | **Multi-turn chat** with follow-up questions rewritten into standalone queries | "What about the second one?" works |
+| Ingestion | **PDF, DOCX, TXT and MD** support, page-aware chunking, batched embeddings | Real documentation isn't only PDFs; large files no longer hit request limits |
+| Ingestion | **Re-ingesting replaces** a document's old chunks; documents can be **deleted** | The original kept stale chunks and blocked re-uploads for 4 hours |
+| Fixes | Replaced `QdrantClient.search`, which current `qdrant-client` versions removed, with `query_points` | The original code fails on current library versions |
+| Quality | **Evaluation script** with a labelled question set, measuring hit@k and MRR (`eval/`) | Retrieval changes are measured, not guessed |
+| Quality | **20 unit tests** (pytest), **GitHub Actions CI** | Safe refactoring |
+| Ops | **Docker Compose** stack (API, Inngest, Qdrant, UI), config via environment variables (`config.py`) | One command to run everything |
 
 ## Results
+
+Retrieval on the included evaluation set (15 questions over two fictional product manuals, top 3 chunks):
+
+| Retrieval | hit@3 | MRR |
+|---|---|---|
+| dense only | 87% | 0.73 |
+| **hybrid (dense + BM25)** | **100%** | **0.87** |
+
+These numbers come from the offline hashing embedder used in CI (`python eval/run_eval.py --offline`). To measure with OpenAI embeddings and check generated answers, run `python eval/run_eval.py --answers` with your API key set.
 
 ![Answer with sources in the Streamlit app](docs/images/answer.png)
 
@@ -91,3 +41,79 @@ Then open http://localhost:8501 for the app and http://localhost:8288 for the In
 
 <img width="1294" height="640" alt="image" src="https://github.com/user-attachments/assets/d58d99ce-a374-467f-a1f7-9e1e97977676" />
 
+## Architecture
+
+```
+Streamlit UI ──event──▶ Inngest ──▶ FastAPI (Inngest functions)
+                                      ├─ RAG: Ingest Document  load → chunk (with pages) → embed → replace in Qdrant
+                                      ├─ RAG: Delete Document
+                                      └─ RAG: Query            condense follow-up → hybrid retrieve
+                                                               → (re-rank) → answer with [n] citations
+```
+
+Ingestion and querying run as Inngest functions, which provides retries, throttling, debouncing and a dashboard showing every step.
+
+## Project structure
+
+| File | Purpose |
+|---|---|
+| `main.py` | FastAPI app and Inngest functions (ingest, delete, query); `/health` and `/sources` endpoints |
+| `retrieval.py` | BM25, Reciprocal Rank Fusion, hybrid retrieval, re-ranking |
+| `prompts.py` | Answer and follow-up prompts, citation extraction |
+| `data_loader.py` | Multi-format loading and page-aware chunking |
+| `embeddings.py` | Batched OpenAI embeddings, plus an offline hashing embedder for tests |
+| `pipeline.py` | Indexing logic shared by the app and the evaluation |
+| `vector_db.py` | Qdrant wrapper (local or server) |
+| `config.py` | All settings, from environment variables |
+| `streamlit_app.py` | Chat UI with document management |
+| `ingest_all.py` | Batch-ingest a folder |
+| `eval/` | Evaluation script, question set and sample documents |
+| `tests/` | Unit and integration tests |
+
+## Getting started
+
+### With Docker
+
+```bash
+cp .env.example .env   # add your OPENAI_API_KEY
+docker compose up --build
+```
+
+Open http://localhost:8501 for the app and http://localhost:8288 for the Inngest dashboard.
+
+### Without Docker
+
+Prerequisites: Python 3.13+, [`uv`](https://docs.astral.sh/uv/), Node.js (for the Inngest dev server), an OpenAI API key.
+
+```bash
+git clone https://github.com/joinsrikanth945/doc-qa-rag-assistant.git
+cd doc-qa-rag-assistant
+uv sync
+cp .env.example .env   # add your OPENAI_API_KEY
+
+# terminal 1: API
+uv run uvicorn main:app --reload --port 8000
+# terminal 2: Inngest dev server
+npx inngest-cli@latest dev -u http://127.0.0.1:8000/api/inngest
+# terminal 3: UI
+uv run streamlit run streamlit_app.py
+```
+
+Batch-ingest a folder: `uv run python ingest_all.py ./my_docs`
+
+### Tests and evaluation
+
+```bash
+uv run pytest -q
+uv run python eval/run_eval.py --offline --verbose
+```
+
+## Configuration
+
+All settings live in `.env` (see `.env.example`): models, chunk size, retrieval mode (`hybrid`/`dense`), re-ranking, and the Qdrant location. Set `QDRANT_URL` to use a Qdrant server; otherwise a local on-disk database is used.
+
+## Possible next steps
+
+- Store BM25 as Qdrant sparse vectors so keyword search scales beyond small collections (it currently scores all chunks in memory)
+- Stream answers token by token
+- Authentication and per-user document collections
