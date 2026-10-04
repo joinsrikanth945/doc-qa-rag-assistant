@@ -1,0 +1,15 @@
+{"question": "What does error E47 mean?", "source": "thermostat_manual.md", "evidence": "reversing valve did not respond", "answer_keywords": ["reversing valve"]}
+{"question": "My thermostat shows E12, what should I check?", "source": "thermostat_manual.md", "evidence": "Lost power on the C-wire", "answer_keywords": ["C-wire"]}
+{"question": "What if my house doesn't have a common wire?", "source": "thermostat_manual.md", "evidence": "Power Extender Kit", "answer_keywords": ["PEK-2"]}
+{"question": "How long is the warranty if a professional installs it?", "source": "thermostat_manual.md", "evidence": "extends the warranty to 5 years", "answer_keywords": ["5 years"]}
+{"question": "How often does it remind me to change the air filter?", "source": "thermostat_manual.md", "evidence": "every 90 days of fan runtime", "answer_keywords": ["90 days"]}
+{"question": "How much does Eco Mode change the temperature when I'm away?", "source": "thermostat_manual.md", "evidence": "lowers the heating setpoint by 4", "answer_keywords": ["4"]}
+{"question": "How do I wipe all the thermostat's settings?", "source": "thermostat_manual.md", "evidence": "Factory reset", "answer_keywords": ["20 seconds"]}
+{"question": "Which O/B setting do most heat pumps use?", "source": "thermostat_manual.md", "evidence": "most manufacturers other than Rheem and Ruud", "answer_keywords": ["O"]}
+{"question": "Can the hub connect to 5 GHz Wi-Fi?", "source": "hub_network_guide.md", "evidence": "only to 2.4 GHz", "answer_keywords": ["2.4 GHz"]}
+{"question": "Which firewall ports need to be open for the hub?", "source": "hub_network_guide.md", "evidence": "port 8883", "answer_keywords": ["8883", "443"]}
+{"question": "What happens to my automations when the internet goes down?", "source": "hub_network_guide.md", "evidence": "keeps running schedules and automations locally", "answer_keywords": ["30 days"]}
+{"question": "What does a blinking red light on the hub mean?", "source": "hub_network_guide.md", "evidence": "Hardware fault", "answer_keywords": ["10 seconds"]}
+{"question": "How many devices can be paired with the hub?", "source": "hub_network_guide.md", "evidence": "up to 64 devices", "answer_keywords": ["64"]}
+{"question": "How do I forget the Wi-Fi network but keep my paired devices?", "source": "hub_network_guide.md", "evidence": "clears the stored Wi-Fi network but keeps paired devices", "answer_keywords": ["10 seconds"]}
+{"question": "Will the hub work on hotel Wi-Fi?", "source": "hub_network_guide.md", "evidence": "captive portal", "answer_keywords": ["not supported"]}
