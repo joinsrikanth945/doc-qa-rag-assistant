@@ -2,7 +2,16 @@
 
 A production-leaning Retrieval-Augmented Generation (RAG) application in Python: ingest PDF documents, ask questions about them in natural language, and get grounded answers with source citations.
 
-I use the same RAG pattern to make long technical product documentation searchable in natural language, cutting down time spent digging through manuals and internal wikis.
+I adapted this pattern to make long technical product documentation searchable in natural language, cutting down time spent digging through manuals and internal wikis.
+
+## Credits
+
+This project is based on Tech With Tim's [Production-Grade RAG Python App](https://github.com/techwithtim/ProductionGradeRAGPythonApp) tutorial. My changes:
+
+- Batch ingestion of a folder of PDFs (`ingest_all.py`)
+- Local file-based Qdrant storage instead of a Qdrant server
+- Updated OpenAI model and request parameters
+- Rewritten documentation and result screenshots
 
 ## Features
 

@@ -1,11 +1,12 @@
 
 import asyncio
+import os
 from pathlib import Path
 
 import inngest
 from main import inngest_client
 
-PDF_FOLDER = r"C:\Users\joins\Downloads\guide"
+PDF_FOLDER = os.getenv("PDF_FOLDER", "./pdfs")
 
 
 async def main():
