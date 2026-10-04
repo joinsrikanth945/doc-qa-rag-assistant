@@ -174,6 +174,11 @@ uv run pytest -q
 
 <img width="1294" height="640" alt="image" src="https://github.com/user-attachments/assets/d58d99ce-a374-467f-a1f7-9e1e97977676" />
 
+<img width="1698" height="805" alt="image" src="https://github.com/user-attachments/assets/4f3e746a-fc16-41ad-9380-81ac0fa1ceeb" />
+
+
 ## Credits
 
 - Starting point: [Tech With Tim – ProductionGradeRAGPythonApp](https://github.com/techwithtim/ProductionGradeRAGPythonApp)
+
+
